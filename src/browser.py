@@ -1,6 +1,5 @@
 #browser.py
 import os
-import asyncio
 from urllib.parse import urlparse
 import nodriver as uc
 from .config import PROFILE_DIR, WINDOW_WIDTH, WINDOW_HEIGHT
@@ -82,26 +81,7 @@ async def stop_browser():
     _browser = None
     if b is not None:
         try:
-            # Close all pages first
-            pages = await b.pages()
-            for page in pages:
-                try:
-                    await page.close()
-                except:
-                    pass
-            
-            # Stop the browser
             await b.stop()
-            
-            # Cancel any remaining tasks
-            loop = asyncio.get_event_loop()
-            tasks = [t for t in asyncio.all_tasks(loop) 
-                    if not t.done() and t != asyncio.current_task()]
-            for task in tasks:
-                task.cancel()
-            if tasks:
-                await asyncio.gather(*tasks, return_exceptions=True)
-                
         except Exception as e:
             log(f"Error stopping browser: {e}", "ERR")
 
